@@ -1,171 +1,73 @@
-
 #include<stdio.h>
+#include<time.h>
 #include<stdlib.h>
-#include<string.h>
-struct node
-{
-  char song[25];
-  struct node *next;
-};
+#define TRUE 1
+#define FALSE 0
 
-typedef struct node *NODEPTR;
-NODEPTR list=NULL;
+void heapbottomup(int h[], int n) {
+    int i, heap, v, j, k;
+    for (i = n / 2; i > 0; i--) {
+        k = i;
+        v = h[k];
+        heap = FALSE;
+        while (!heap && (2 * k) <= n) {
+            j = 2 * k;
+            if (j < n)
+                if (h[j] < h[j + 1])
+                    j = j + 1;
+            if (v >= h[j])
+                heap = TRUE;
+            else {
+                h[k] = h[j];
+                k = j;
+            }
+        }
+        h[k] = v;
+    }
+}
 
 
-/*getnode()*/
-NODEPTR getnode()
-{
-  NODEPTR r;
-  r=(NODEPTR)malloc(sizeof(struct node));
-  if(r==NULL)
-  {
-    printf("Allocation failed\n");
+void heapsort(int h[],int n)
+{    
+	int temp,last=n;
+	if(n<=1)
     return;
-  }
-  return r;
-}
-
-
-//create a list
-
-NODEPTR create(NODEPTR list, char song[])
-{
-	NODEPTR p,q;
-	p=getnode();
-	strcpy(p->song,song);
-	p->next=NULL;
-	if(list==NULL)
-		list=p;
-	else{
-		for(q=list; q->next!=NULL; q=q->next)
-		;
-		q->next=p;
+    else
+    {
+	heapbottomup(h,n);
+	temp=h[last];
+	h[last]=h[1];
+	h[1]=temp;
+	last--;
+    heapsort(h,n-1);
 	}
-	return(list);
 }
 
-void playbegin(NODEPTR list)
-{
- NODEPTR p;
- p=list;
- if(list==NULL)
-   printf("Empty playlist");
- else
- printf("\n Playing %s\n",p->song);
-}
+int main() {
+    int h[20], n, i;
+    double clk;
+    clock_t starttime, endtime;
 
-void playend(NODEPTR list)
-{
- NODEPTR p;
- p=list;
- if(list==NULL)
-  printf("Empty playlist");
- else {
- while(p->next!=NULL)
-    p=p->next;
- printf("\n Playing %s\n",p->song);
-}
-}
+    printf("\nEnter the number of resumes\n");
+    scanf("%d", &n);
 
-NODEPTR deletebegin(NODEPTR list)
-{
-	NODEPTR p;
-	p=list;
-        if(list==NULL)
-  		printf("\n Empty playlist");
- 	else{
- 	printf("\n Song deleted =%s",p->song); 
-	list=p->next;
-	free(p);
-	return(list);
-       }
-}
-
-NODEPTR deleteend(NODEPTR list)
-{
-	NODEPTR p,q;
-	p=list;
-	q=NULL;
-	if(list==NULL)
-  		printf("Empty playlist");
-  	else if(list->next==NULL)	
-  	   {
-  	     printf("\n Song deleted =%s",p->song); 
-      	 list=p->next;
-    	 free(p);
-    	 return(list); 
-  	   }
- 	else{
-	    while(p->next!=NULL)
-	    {
-	        q=p;  
-            p=p->next;
-	    } 
-           q->next=p->next;
-            printf("\n Song deleted =%s",p->song);
-	free(p);
-	return(list);
-   }
-}
-
-void display(NODEPTR list)
-{
-    NODEPTR p;
-    if(list==NULL)
-    {
-        printf("Empty list");
+    for (i = 1; i <= n; i++) {
+        h[i] = rand() % 100;
+        printf("The candidates ranks are: \t%d\n", h[i]);
     }
-    else{
-    printf("The playlist contains:\n");
-    for(p=list;p!=NULL;p=p->next)
-       printf("%s ",p->song);
-       printf("\n");
+
+    starttime = clock();
+    heapsort(h, n);
+    endtime = clock();
+
+    clk = (double)(endtime - starttime) / CLOCKS_PER_SEC;
+
+    printf("\nThe ranks in sorted order:\n");
+    for (i = 1; i <= n; i++) {
+        printf("\t%d", h[i]);
     }
+
+    printf("\nThe run time is %f\n", clk);
+
+    return 0;
 }
-
-main()
-{
-    int choice;
-    int cont;
-    char song[25];
-    do{
-    printf("1->CREATE PLAYLIST 2->PLAY FROM BEGINNINNG 3->PLAY FROM END 4->DELETE FROM BEGINNING  5->DELETE FROM END  6->DISPLAY  7->QUIT\n");
-    printf("Enter your choice:");
-    scanf("%d",&choice);
-    switch(choice)
-    {
-     case 1:  do{
-              	  printf("Enter a song:");
-              	  scanf("%s",song);
-              	  list = create(list,song);
-              	  printf("Do you want to enter another song[1/0]:");
-               	 scanf(" %d",&cont);
-               }while(cont==1);
-               break;
-
-     case 2:   playbegin(list);
-               break;
-
-     case 3:   playend(list);
-               break;
-
-     case 4:   list=deletebegin(list);
-               break;
-
-     case 5:   list=deleteend(list);
-               break;     
-    
-     case 6:   display(list);
-               break;
-     
-     case 7:   exit(1);
-     
-     default : printf("\nNo such option");
-               break;
-
-   }
-}while(choice!=7);
-}
-
-
-
