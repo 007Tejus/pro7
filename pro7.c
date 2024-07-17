@@ -1,73 +1,60 @@
 #include<stdio.h>
-#include<time.h>
 #include<stdlib.h>
-#define TRUE 1
-#define FALSE 0
+#include<math.h>
 
-void heapbottomup(int h[], int n) {
-    int i, heap, v, j, k;
-    for (i = n / 2; i > 0; i--) {
-        k = i;
-        v = h[k];
-        heap = FALSE;
-        while (!heap && (2 * k) <= n) {
-            j = 2 * k;
-            if (j < n)
-                if (h[j] < h[j + 1])
-                    j = j + 1;
-            if (v >= h[j])
-                heap = TRUE;
-            else {
-                h[k] = h[j];
-                k = j;
+#define FALSE 0
+#define TRUE 1
+
+int x[20];
+int solution_found = FALSE;
+
+int place(int k, int i)
+{
+    int j;
+    for(j = 1; j < k; j++)
+    {
+        if((x[j] == i) || (abs(x[j] - i) == abs(j - k)))
+            return FALSE;
+    }
+    return TRUE;
+}
+
+void nqueens(int k, int n)
+{
+    int i, a;
+    for(i = 1; i <= n; i++)
+    {
+        if(place(k, i))
+        {
+            x[k] = i;
+            if(k == n)
+            {
+                solution_found = TRUE;
+                for(a = 1; a <= n; a++)
+                    printf("%d\t", x[a]);
+                printf("\n");
+            }
+            else
+            {
+                nqueens(k + 1, n);
             }
         }
-        h[k] = v;
     }
 }
 
-
-void heapsort(int h[],int n)
-{    
-	int temp,last=n;
-	if(n<=1)
-    return;
-    else
-    {
-	heapbottomup(h,n);
-	temp=h[last];
-	h[last]=h[1];
-	h[1]=temp;
-	last--;
-    heapsort(h,n-1);
-	}
-}
-
-int main() {
-    int h[20], n, i;
-    double clk;
-    clock_t starttime, endtime;
-
-    printf("\nEnter the number of resumes\n");
+int main()
+{
+    int n;
+    printf("\nEnter the number of queens: ");
     scanf("%d", &n);
+    printf("\nThe solution to the N Queens problem is:\n");
 
-    for (i = 1; i <= n; i++) {
-        h[i] = rand() % 100;
-        printf("The candidates ranks are: \t%d\n", h[i]);
+    nqueens(1, n);
+
+    if (!solution_found)
+    {
+        printf("No solution available.\n");
     }
-
-    starttime = clock();
-    heapsort(h, n);
-    endtime = clock();
-
-    clk = (double)(endtime - starttime) / CLOCKS_PER_SEC;
-
-    printf("\nThe ranks in sorted order:\n");
-    for (i = 1; i <= n; i++) {
-        printf("\t%d", h[i]);
-    }
-
-    printf("\nThe run time is %f\n", clk);
 
     return 0;
 }
